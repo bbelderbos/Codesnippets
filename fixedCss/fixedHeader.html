@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en"> 
+<head>
+  <title>Fixed header</title>
+  <link rel="stylesheet" href="reset.css" type="text/css" media="screen" />
+  <style>
+	/* markers for design */
+	nav {
+		border: 1px solid #999;
+	}
+	#content {
+		border: 1px solid red;
+	}
+	footer {
+		border: 1px solid blue;
+	}
+	
+	nav {
+		position: fixed;
+		left: 0;
+		top: 0;
+		background: #f2f2f2;
+		width: 100%;
+		heigth: 20px;
+		padding: 10px;
+		z-index: 20;
+	}
+	nav ul, h1, h2 {
+		float: left;
+	}
+	nav ul {
+		list-style: none;
+	}
+	nav ul li {
+		margin: 0 10px;
+		float: left;
+	}
+	#content {
+		position: relative; 
+		top: 40px;
+		background-color: #eee;
+		z-index: 10;
+	}
+	#main {
+		padding: 10px;
+		line-height: 20; /* to fake content with a huge height without much clutter content */
+	}
+	footer {
+		width: 100%; 
+		background-color: #ddd;
+		position: fixed;
+		bottom: 0;
+		left: 200;
+	}
+  </style>
+</head>
+<body>
+  <nav>
+	<h1>Fixed header</h1>
+	<h2>Subheader</h2>
+	<ul>
+		<li><a href="#">Link 1</a></li>
+		<li><a href="#">Link 2</a></li>
+		<li><a href="#">Link 3</a></li>
+		<li><a href="#">Link 4</a></li>
+	</ul>
+  </nav>
+
+  <div id="content">
+		<div id="main">
+			1st paragraph<br>
+			2nd paragraph<br>
+			3rd paragraph<br>
+			4th paragraph<br>
+			5th paragraph<br>
+			6th paragraph<br>
+			7th paragraph<br>
+		</div>
+		
+		<footer>
+			copyright notice
+		</footer>
+	
+	</div>
+
+
+</body>
+</html>
