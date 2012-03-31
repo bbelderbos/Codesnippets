@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"> 
 <head>
-  <title>Fixed header</title>
+  <title>Fixed sidebar</title>
   <link rel="stylesheet" href="reset.css" type="text/css" media="screen" />
   <style>
 	/* markers for design */
@@ -19,31 +19,24 @@
 		position: fixed;
 		left: 0;
 		top: 0;
+		bottom: 0;
 		background: #f2f2f2;
-		width: 100%;
-		heigth: 20px;
+		width: 180px;
 		padding: 10px;
-		z-index: 20;
-	}
-	nav ul, h1, h2 {
-		float: left;
 	}
 	nav ul {
 		list-style: none;
 	}
 	nav ul li {
-		margin: 0 10px;
-		float: left;
+		margin: 10px 0;
 	}
 	#content {
-		position: relative; 
-		top: 40px;
+		margin: 0 0 30px 210px;
 		background-color: #eee;
-		z-index: 10;
 	}
 	#main {
 		padding: 10px;
-		line-height: 20; /* to fake content with a huge height without much clutter content */
+		line-height: 20; /* to fake lot of content / scrolling */
 	}
 	footer {
 		width: 100%; 
@@ -56,7 +49,7 @@
 </head>
 <body>
   <nav>
-	<h1>Fixed header</h1>
+	<h1>Fixed sidebar</h1>
 	<h2>Subheader</h2>
 	<ul>
 		<li><a href="#">Link 1</a></li>
