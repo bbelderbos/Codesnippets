@@ -25,12 +25,12 @@ for row in soup.find_all(attrs={'class': 'row'}):
   thumb = row.select("img")[0]['src']
   twitter = row.select("a")[0]['href']
   facebook = row.select("a")[1]['href']
+  tstamp = int(time())
   
-  sql = """INSERT INTO top_ranking 
-          (id, name, followers, likes, thumb, twitter, facebook, audit_who, audit_ins, audit_upd)
-          VALUES
+  sql = """INSERT INTO top_ranking (id, name, followers, likes, thumb, 
+          twitter, facebook, audit_who, audit_ins, audit_upd) VALUES
           (NULL, '%s', '%s', '%s', '%s', '%s', '%s', 'admin', '%d', NULL);
-          """ % (name, followers, likes, thumb, twitter, facebook, int(time()) )
+          """ % (name, followers, likes, thumb, twitter, facebook, tstamp )
   
   try:
     cursor.execute(sql)
