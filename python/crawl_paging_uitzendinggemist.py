@@ -6,8 +6,8 @@
 
 import urllib
 from bs4 import BeautifulSoup as Soup
-base_url = "http://www.uitzendinggemist.nl/"
-program_url = base_url + "programmas/?page="
+base_url = "http://www.uitzendinggemist.nl"
+program_url = base_url + "/programmas/?page="
 
 for page in range(1, 93):
   url =  "%s%d" % (program_url, page)
