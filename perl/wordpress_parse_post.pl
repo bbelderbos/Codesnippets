@@ -21,7 +21,6 @@ while(<POST>){
 		next;
 	}
 
-
 	
 	# HANDLING CODE BLOCKS
 
@@ -47,13 +46,13 @@ while(<POST>){
 
 	# print literal # lines (designed to put it literal html)
 	if(/^#/) {
-		s/#//g; 
+	  s/^#//g; 
 	  print;
 	  next;
 	}
 
 
-  # FB LIKE BUTTON
+  	# FB LIKE BUTTON
 
 	s/^LIKE/<fb:like href="" send="true" width="580" show_faces="false" action="like" font=""><\/fb:like>/g;
 
@@ -77,14 +76,13 @@ while(<POST>){
 	s/^::(.*?)\s?$/<p>$1<\/p>/g; 
 	
 	# ul li blocks
-  s/^-(.*)/<li>$1<\/li>/g;
-  s/^\*{2}/<\/ul>/g;
-  s/^\*/<ul>/g;
+  	s/^-(.*)/<li>$1<\/li>/g;
+  	s/^\*{2}/<\/ul>/g;
+  	s/^\*/<ul>/g;
 
 
-  # PRINT RESULT
-
-  print;
+  	# PRINT PARSED LINE
+  	print;
 
 
 }
