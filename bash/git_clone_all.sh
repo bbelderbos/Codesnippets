@@ -1,6 +1,8 @@
 #!/bin/bash
 # import multiple remote git repositories to local CODE dir
 
+set -e
+
 # settings / change this to your config
 remoteHost=example.com
 remoteUser=username
