@@ -1,6 +1,7 @@
 #!/bin/bash
-# see also http://bobbelderbos.com/2012/03/push-code-remote-web-server-git/
-
+# blog post: http://bobbelderbos.com/2012/03/push-code-remote-web-server-git/
+# usage: ./git_create_new_repo.sh [repoName] [path_to_working_directory] 
+# note: personal use, in production this should be better validated
 set -e
 
 REPO_DIR=$HOME/repositories

@@ -1,16 +1,25 @@
 #!/usr/bin/perl
 # copyright (c) bob belderbos
 # blog post: http://bobbelderbos.com/2011/08/simple-text-to-html-parser-perl-wordpress/
+# usage: parsePost.pl blogpost.txt (generates blogpost.html)
 
 use strict;
 use warnings; 
 
-die "Please specify your marked up blog text file ...\n" unless $ARGV[0]; 
+die "Please provide the blogpost.txt to parse ...\n" unless $ARGV[0]; 
  
-my $file = shift @ARGV;
+
+my $blogTxtFile = shift @ARGV;
+die "Cannot open <$blogTxtFile> ...\n"  unless open POST, "<$blogTxtFile";
+
+
+my $blogHtmlFile = $blogTxtFile; 
+$blogHtmlFile =~ s/(.*)\.txt$/$1\.html/g;
+open OUT, ">$blogHtmlFile" or die "Cannot open <$blogHtmlFile> ...\n";
+
+
 my $parse = 1;  # toggle for code blocks
 
-die "Cannot open file <$file> ...\n"  unless open POST, '<', $file;
 
 while(<POST>){
 
@@ -25,18 +34,18 @@ while(<POST>){
 	# HANDLING CODE BLOCKS
 
 	if(/^CODE/) {
-	  print "\n<pre>\n";
+	  print OUT "\n<pre>\n";
 		$parse = 0;
 		next; 
 	}
 	if(/^\/CODE/){
-	  print "</pre>\n";	  
+	  print OUT "</pre>\n";	  
 	  $parse = 1;
 		next; 
 	}
 	# when in code blog, print everything literally as stated
 	if($parse == 0){
-	  print;
+	  print OUT $_;
 	  next;
 	}
 
@@ -47,12 +56,12 @@ while(<POST>){
 	# print literal # lines (designed to put it literal html)
 	if(/^#/) {
 	  s/^#//g; 
-	  print;
+	  print OUT $_;
 	  next;
 	}
 
 
-  	# FB LIKE BUTTON
+  # FB LIKE BUTTON
 
 	s/^LIKE/<fb:like href="" send="true" width="580" show_faces="false" action="like" font=""><\/fb:like>/g;
 
@@ -76,13 +85,15 @@ while(<POST>){
 	s/^::(.*?)\s?$/<p>$1<\/p>/g; 
 	
 	# ul li blocks
-  	s/^-(.*)/<li>$1<\/li>/g;
-  	s/^\*{2}/<\/ul>/g;
-  	s/^\*/<ul>/g;
+	s/^-(.*)/<li>$1<\/li>/g;
+	s/^\*{2}/<\/ul>/g;
+	s/^\*/<ul>/g;
 
 
-  	# PRINT PARSED LINE
-  	print;
+	# PRINT PARSED LINE
+	print OUT $_;
 
 
 }
+
+close(OUT);
