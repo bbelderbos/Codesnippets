@@ -70,6 +70,10 @@ for i in $valid_movie_ids;
 		${cmd}movie/$i?api_key=$moviedb_key >> get_movie_info
 		${cmd}movie/$i/casts?api_key=$moviedb_key >> get_movie_cast
 		${cmd}movie/$i/keywords?api_key=$moviedb_key >> get_movie_keywords
+		# make sure we sleep 1 second before next request, to not hit 
+		# Error 503, service not available
+		sleep 1
+
 	done
 
 
