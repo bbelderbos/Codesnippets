@@ -39,7 +39,7 @@ for movie in movies:
 		print "Actors: " + data['Actors']  + "<br>"
 		print "Plot: " + data['Plot']  + "<br>"
 		if not "N/A" in data['Poster']:
-			print "<img width='200px' src='" + data['Poster']  + "'><br>"
+			print "Poster: <a href='" + data['Poster']  + "' target='_blank'>here</a><br>"
 		print data['imdbRating'] + " (" + data['imdbVotes'] + " votes)<br>"
 		print "IMDB: <a href='http://imdb.com/title/" + data['imdbID'] + "' target='_blank'>http://imdb.com/title/" + data['imdbID'] + "</a><br>"
 
