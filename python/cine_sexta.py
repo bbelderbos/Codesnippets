@@ -9,11 +9,9 @@ def getImdbInfo(title):
 	title = urllib.quote(title)
 	imdbapiUrl = 'http://imdbapi.com/?t=%s' % title
 	json_data=urllib.urlopen(imdbapiUrl)
-
 	data = json.load(json_data)
-	json_data.close()
-
-	return (data['Title'], data['Year'], data['imdbID'])
+	json_data.close()   
+	return data
 
 
 
@@ -23,17 +21,29 @@ movies = soup.find(id="emisiones").find_all("div")
 
 for movie in movies: 
 	movieName = movie.li.p.get_text().encode('latin-1')
+	if "Teletienda" in movieName or "Todo cine" in movieName: 
+		continue
+
 	startTime = movie.li.time.get_text()
-	print startTime,
-	print movieName
+	print "Movie: " + movieName + "<br>"
+	print "Starts: " + startTime + "<br>"
 
 	try: 
-		(orgTitle, year, imdb) = getImdbInfo(movieName)
-	except: 
-		(orgTitle, year, imdb) = ''
+		data = getImdbInfo(movieName)
+		print "<br>==<br>"
+		print "From IMDB API: <br>"
+		print "Title: " + data['Title'].encode('latin-1') + "<br>"
+		print "Year: " + data['Year']  + "<br>"
+		print "Genre: " + data['Genre']  + "<br>"
+		print "Director: " + data['Director']  + "<br>"
+		print "Actors: " + data['Actors']  + "<br>"
+		print "Plot: " + data['Plot']  + "<br>"
+		if not "N/A" in data['Poster']:
+			print "<img width='200px' src='" + data['Poster']  + "'><br>"
+		print data['imdbRating'] + " (" + data['imdbVotes'] + " votes)<br>"
+		print "IMDB: <a href='http://imdb.com/title/" + data['imdbID'] + "' target='_blank'>http://imdb.com/title/" + data['imdbID'] + "</a><br>"
 
-	print orgTitle.encode('latin-1')
-	print year
-	print "http://imdb.com/title/",
-	print imdb 
-	print "==\n"
+	except: 
+		print "Cannot get IMDB API info<br>"
+
+	print "==<br><br>"

@@ -22,11 +22,11 @@ for movie in movies:
 		hour = movie.find_all("span", { "class" : "hora" })[0].get_text()
 		title = " ".join(movie.find_all("span", { "class" : "mes" })[0].get_text().split(': ')[1:]).encode('latin-1')
 		
-		print channel
-		print hour 
-		print title
-		print "http://www.imdbapi.com/?t=" + urllib.quote(title)
-		print "==\n"
+		print channel + "<br>"
+		print hour + "<br>" 
+		print title + "<br>"
+		print "<a href='http://imdbapi.com/?t=" + urllib.quote(title) +"' target='_blank'>http://imdbapi.com/?t=" + urllib.quote(title) + "</a><br>"
+		print "==<br><br>"
 
 	except: 
 		pass
