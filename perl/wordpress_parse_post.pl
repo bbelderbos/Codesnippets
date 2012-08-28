@@ -5,6 +5,7 @@
 
 use strict;
 use warnings; 
+use HTML::Entities;
 
 die "Please provide the blogpost.txt to parse ...\n" unless $ARGV[0]; 
  
@@ -43,9 +44,10 @@ while(<POST>){
 	  $parse = 1;
 		next; 
 	}
-	# when in code blog, print everything literally as stated
+	# when in code blog, encode all to not conflict with html page and/or
+	# php of WP
 	if($parse == 0){
-	  print OUT $_;
+	  print OUT encode_entities($_);
 	  next;
 	}
 

@@ -1,0 +1,12 @@
+# start vimrc file - aug 2012
+call pathogen#infect()
+syntax on
+filetype plugin indent on
+
+let mapleader = "," 
+set nu
+set cursorline                                                                                                    
+highlight CursorLine guibg=lightblue ctermbg=lightgray
+set hls is
+" <Ctrl-l> redraws the screen and removes any search highlighting.
+nnoremap <silent> <C-l> :nohl<CR><C-l>
