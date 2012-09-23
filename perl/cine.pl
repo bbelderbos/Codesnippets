@@ -12,7 +12,7 @@ use Encode qw(encode decode); # http://perlgeek.de/en/article/encodings-and-unic
 
 my $enc = 'utf-8'; 
 my $output;
-my $email = "yourname\@example.com";
+my $email = "yourname\@mail.com";
 
 my @html = getUrl("http://www.sincroguia.tv/todas-las-peliculas.html");
 
@@ -49,17 +49,40 @@ sub getUrl {
 
 sub getMovieInfo {
   my $url = shift; 
-  my $info;
+  my $info = q{};
   for(getUrl($url)){
-    next if(! /column/);
-    for my $line (split /<\/?h3[> ]/, $_){
-      if($line =~ /Director:|rpretes|Idioma|Nacionalidad|A&ntilde/){
-        $line =~ s/.*?strong>(.*)<\/strong>(.*)/$1$2\n/g;        
-        $line =~ s/A&ntilde;o/Estreno/g;
-        $info .= $line ;
+    
+    if( /column/) {
+      for my $line (split /<\/?h3[> ]/, $_){
+        if($line =~ /Director:|rpretes|Idioma|Nacionalidad|A&ntilde/){
+          $line =~ s/.*?strong>(.*)<\/strong>(.*)/$1$2\n/g;        
+          $line =~ s/A&ntilde;o/Estreno/g;
+          $info .= $line ;
+        }
+      }
+      $info .= "\n";
+    }
+
+
+    if( /contentficha/ ) {
+      my @lines = split /\n/;
+      for my $line (@lines) {
+        if($line =~ /<h2>|Calificaci/){
+          $line =~ s/.*?(<br.*)/$1/g;        # take the img off the summary
+          $line =~ s/(\s*<[^>]+?>\s*)+//g;   # take out all html tags
+          $line =~ s/\((.*?)\)/ |> $1 <| /g;       # spaces around subtitle
+          $info .= "$line\n\n"; 
+        }
       }
     }
-    last; 
+
+    # get the links to share this movie on FB and Twitter
+    if( /.*(http.*facebook.com[^'"]+\.html).*/ ) {
+      m/.*(http.*facebook.com[^'"]+\.html).*(http.*twitter.com\/intent[^'"]+).*/sm;
+      $info .= "Share on Facebook: $1\n";
+      $info .= "Share on Twitter: $2\n";
+    }
+
   }
   return $info;
 }  
