@@ -70,15 +70,18 @@ class TvCine(object):
 
 
   def print_movie_titles(self): 
+    print "I. Movies Spanish TV Today %s:00-%s:00\n" % (self.START_TIME, self.END_TIME)
     for m in self.movies:
       print m['time'], m['title']
+    print "\n\n"
       
 
   def print_movie_details(self):
+    print "II. Details for each movie ... \n" 
     for m in self.movies:
-      print "+" * 110
+      print "+" * 80
       print m['time'], m['title']
-      print "+" * 110
+      print "+" * 80
       print "URL: \n" + m['url']
       print "\nDetails: \n" + m['info']
       print "\n\n"
