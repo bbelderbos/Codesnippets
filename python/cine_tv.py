@@ -3,26 +3,29 @@
 # Author: Bob Belderbos / written: Dec 2012
 # Purpose: get movies aired on Spanish tv to use in 24-hour cronjob
 #
-import pprint ;  pp = pprint.PrettyPrinter(indent=4)
-import urllib, sys
-from time import time
+import pprint, urllib, sys, datetime
 from bs4 import BeautifulSoup as Soup
 
 class TvCine(object):
 
   def __init__(self):
-    """ Setup """
-    # show movies from 20-24 for now, todo: make these limits cli args
-    self.START_TIME = 20
+    """ Setup variables, define hour range of which I want to know the movie airing of """
+    # if weekday (0-4 - 0 being Monday) show movies from 20-24h, weekend I want to see all movies aired: 
+    self.weekday = datetime.datetime.today().weekday() 
+    if self.weekday in [5,6]: # 5 = Sat, 6 = Sun
+      self.START_TIME = 9
+    else: 
+      self.START_TIME = 20
+    # always end at midnight (tomorrow a new day, so a new output from cron)
     self.END_TIME = 00
     self.moviePage = "http://www.sincroguia.tv/todas-las-peliculas.html" 
     self.movies = self.parse_movies()
-    #pp.pprint(self.movies); sys.exit()
+    # pprint.pprint(self.movies); sys.exit()
 
 
   def parse_movies(self):
     """ Import the movie URL """
-    soup = Soup(urllib.urlopen(self.moviePage))
+    soup = Soup(self.read_url(self.moviePage))
     movies = []
     for link in soup.find_all("a"):
       time = link.previous_sibling
@@ -41,21 +44,27 @@ class TvCine(object):
 
    
   def get_movie_verbose_info(self, title, url):
+    """ Read the movie page in and return the translated title if available and all movie info """
     html = self.read_url(url)
+    # try to get the relevant html section of the movie page, if nothing found too bad, move on
     soup = self.filter_relevant_bits(html)
     titleInfo = ficha = contentficha = ""; lineNum = 0
-    for line in soup.li.stripped_strings: 
-      ficha += line + "\n"
-    for line in soup.find_all('li')[1].stripped_strings:
-      lineNum += 1
-      if lineNum<3: titleInfo += line
-      contentficha += line + "\n"
-    # somtimes there is not a translated title, in that case echo the original title
-    titleInfo = titleInfo.replace("(", " (") if "(" in titleInfo else title
+    if soup: 
+      for line in soup.li.stripped_strings: 
+        ficha += line + "\n"
+      for line in soup.find_all('li')[1].stripped_strings:
+        lineNum += 1
+        if lineNum<3: titleInfo += line
+        contentficha += line + "\n"
+      # somtimes there is not a translated title, in that case echo the original title
+      titleInfo = titleInfo.replace("(", " (") if "(" in titleInfo else title
+    else:
+      ficha = "Not able to obtain movie info for %s" % title
     return (titleInfo, ficha+"\n"+contentficha)
 
 
   def read_url(self, url):
+    """ Read and return the content of a url """
     f = urllib.urlopen(url) 
     html = f.read()
     f.close
@@ -63,13 +72,18 @@ class TvCine(object):
 
   
   def filter_relevant_bits(self, html):
+    """ Get the html part that matters from the movie page """
     a = html.split('class="ficha">')
-    movieInfo = a[1].split('<a href="javascript:;" onclick="remote')
+    try:
+      movieInfo = a[1].split('<a href="javascript:;" onclick="remote')
+    except IndexError:
+      return False 
     soup = Soup(movieInfo[0]) 
     return soup
 
 
   def print_movie_titles(self): 
+    """ Print all the movie titles to be aired on Spanish TV today """
     print "I. Movies Spanish TV Today %s:00-%s:00\n" % (self.START_TIME, self.END_TIME)
     for m in self.movies:
       print m['time'], m['title']
@@ -77,6 +91,7 @@ class TvCine(object):
       
 
   def print_movie_details(self):
+    """ Print verbose details for each movie """
     print "II. Details for each movie ... \n" 
     for m in self.movies:
       print "+" * 80
