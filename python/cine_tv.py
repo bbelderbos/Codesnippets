@@ -3,7 +3,7 @@
 # Author: Bob Belderbos / written: Dec 2012
 # Purpose: get movies aired on Spanish tv to use in 24-hour cronjob
 #
-import pprint, urllib, sys, datetime
+import pprint, urllib, re, sys, datetime
 from bs4 import BeautifulSoup as Soup
 
 class TvCine(object):
@@ -29,6 +29,10 @@ class TvCine(object):
     movies = []
     for link in soup.find_all("a"):
       time = link.previous_sibling
+      try:
+        channel = re.sub(r".* - ", "", str(link.contents[0].encode(encoding='UTF-8',errors='strict')))
+      except:
+        channel = "not_found" 
       url = link.get('href')
       title = link.get('title')
       if not "/peliculas/" in url: continue
@@ -36,6 +40,7 @@ class TvCine(object):
       if time[:2] == self.END_TIME: break
       (longTitle, verboseInfo) = self.get_movie_verbose_info(title, url)
       movies.append({ 'time': time[0:6], 
+                      'channel': channel,
                       'title':longTitle.encode(encoding='UTF-8',errors='strict'), 
                       'url': url.encode(encoding='UTF-8',errors='strict'), 
                       'info': verboseInfo.encode(encoding='UTF-8',errors='strict'),  
@@ -86,7 +91,7 @@ class TvCine(object):
     """ Print all the movie titles to be aired on Spanish TV today """
     print "I. Movies Spanish TV Today %s:00-%s:00\n" % (self.START_TIME, self.END_TIME)
     for m in self.movies:
-      print m['time'], m['title']
+      print m['time'], " | ", "%-8s" % m['channel'], " | ", m['title']
     print "\n\n"
       
 
@@ -95,7 +100,7 @@ class TvCine(object):
     print "II. Details for each movie ... \n" 
     for m in self.movies:
       print "+" * 80
-      print m['time'], m['title']
+      print m['time'], " | ", "%-8s" % m['channel'], " | ", m['title']
       print "+" * 80
       print "URL: \n" + m['url']
       print "\nDetails: \n" + m['info']
