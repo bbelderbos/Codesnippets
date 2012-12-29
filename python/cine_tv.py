@@ -53,16 +53,15 @@ class TvCine(object):
     html = self.read_url(url)
     # try to get the relevant html section of the movie page, if nothing found too bad, move on
     soup = self.filter_relevant_bits(html)
-    titleInfo = ficha = contentficha = ""; lineNum = 0
+    titleInfo = ficha = contentficha = ""
+    lineNum = 0
     if soup: 
       for line in soup.li.stripped_strings: 
         ficha += line + "\n"
       for line in soup.find_all('li')[1].stripped_strings:
         lineNum += 1
-        if lineNum<3: titleInfo += line
+        if lineNum<3: titleInfo += line + " "
         contentficha += line + "\n"
-      # somtimes there is not a translated title, in that case echo the original title
-      titleInfo = titleInfo.replace("(", " (") if "(" in titleInfo else title
     else:
       ficha = "Not able to obtain movie info for %s" % title
     return (titleInfo, ficha+"\n"+contentficha)
