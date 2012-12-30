@@ -38,7 +38,7 @@ class GithubSearch:
           print "This is an invalid option, try again"
         else:
           chosen = True
-      if choice == 'q': sys.exit("Selected -q-, exiting ...")
+      if choice == 'q': sys.exit("Goodbye!")
       if choice == 'n': self.new_search() 
       if choice == 's': self.show_script_context()
 
@@ -92,9 +92,12 @@ class GithubSearch:
       self.print_banner(lang, url)
       self.scripts.append(url) # keep track of script links 
       for line in lines[2:]:
-        if "github.com" in line or "[Next" in line: continue # ignore pagination markup
-        for word in self.searchTerm.split("+"):
-          if word in line: print "---> %s" % line.strip()
+        # ignore pagination markup
+        if "github.com" in line or "https://git" in line or "[Next" in line: continue 
+        if line.strip() == "": continue
+        #for word in self.searchTerm.split("+"):
+        #  if word in line: print "---> %s" % line.strip()
+        print line
 
 
   def print_banner(self, lang, url):
