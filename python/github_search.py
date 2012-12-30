@@ -21,7 +21,7 @@ class GithubSearch:
     """ Show a menu to interactively use this program """
     prompt = """
       (N)ew search
-      (S)how script of code sample
+      (S)how more context (github script)
       (Q)uit
       Enter choice: """
     while True:
@@ -34,15 +34,13 @@ class GithubSearch:
         except:
           sys.exit("Not a valid option")
         print '\nYou picked: [%s]' % choice 
-        if not choice.isdigit() and choice not in 'nsq':
+        if choice not in 'nsq':
           print "This is an invalid option, try again"
         else:
           chosen = True
       if choice == 'q': sys.exit("Selected -q-, exiting ...")
       if choice == 'n': self.new_search() 
       if choice == 's': self.show_script_context()
-      # I usually throw a number in after (N), instead of going to (S) first
-      if choice.isdigit(): self.show_script_context(int(choice)) 
 
   
   def new_search(self):
@@ -51,10 +49,14 @@ class GithubSearch:
     self.scripts = [] 
     self.counter = 0
     # take user input to define the search
-    self.searchTerm = raw_input("Enter search term: ").strip().lower().replace(" ", "+")
-    lang = raw_input("Programming language (default = all): ").strip().lower()
     try:
-      numSearchPages = int(raw_input("Number of search pages to process (more takes longer // default = 3): ").strip()[0])
+      self.searchTerm = raw_input("Enter search term: ").strip().lower().replace(" ", "+")
+    except:
+      sys.exit("Error handling this search term, exiting ...")
+    lang = raw_input("Filter on programming language (press Enter to include all): ").strip().lower()
+    try:
+      prompt = "Number of search pages to process (default = 3): "
+      numSearchPages = int(raw_input(prompt).strip()[0])
     except:
       numSearchPages = 3
     # get the search results
@@ -91,17 +93,14 @@ class GithubSearch:
       self.scripts.append(url) # keep track of script links 
       for line in lines[2:]:
         if "github.com" in line or "[Next" in line: continue # ignore pagination markup
-        print ">> %s" % line
+        for word in self.searchTerm.split("+"):
+          if word in line: print "---> %s" % line.strip()
 
 
   def print_banner(self, lang, url):
     """ Print the script, lang, etc. in a clearly formatted way """
-    width = 140
-    delimit = "+" * width
-    print "\n"
-    print delimit
+    print "\n" + "+" * 125
     print "(%i) %s / src: %s" % (self.counter, lang, url)
-    print delimit
 
 
   def show_script_context(self, script_num=""):
@@ -110,11 +109,14 @@ class GithubSearch:
     if len(self.scripts) == 0:
       print "There are no search results yet, so cannot show any scripts yet."
       return False
-    if not script_num:
-      script_num = int(raw_input("Enter search result number: ").strip())
+    script_num = int(raw_input("Enter search result number: ").strip())
     try: 
-      script = self.scripts[script_num-1]
-      lines = urllib.urlopen(script).readlines() 
+      script = self.scripts[script_num-1] # list starts with index 0 = 1 less than counter
+      a = urllib.urlopen(script)
+      if a.getcode() != 200:
+        print "The requested script did not give a 200 return code"
+        return False
+      lines = a.readlines() 
       if len(lines) == 0:
         print "Did not get content back from script, maybe it is gone?"
         return False
