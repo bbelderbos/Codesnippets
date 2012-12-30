@@ -79,8 +79,7 @@ class GithubSearch:
 
 
   def parse_search_result(self, result):
-    """ Process the search results, also store each script URL in a dict for potential reference
-        (if (D)ownload option is chosen from menu) """
+    """ Process the search results, also store each script URL in a list for reference """
     lines = result.split("\n")
     source = "".join(lines[0:2])
     pattern = re.compile(r".*\((.*?)\)\s+\((.*?)\).*")
@@ -95,8 +94,6 @@ class GithubSearch:
         # ignore pagination markup
         if "github.com" in line or "https://git" in line or "[Next" in line: continue 
         if line.strip() == "": continue
-        #for word in self.searchTerm.split("+"):
-        #  if word in line: print "---> %s" % line.strip()
         print line
 
 
@@ -113,34 +110,30 @@ class GithubSearch:
       print "There are no search results yet, so cannot show any scripts yet."
       return False
     script_num = int(raw_input("Enter search result number: ").strip())
-    try: 
-      script = self.scripts[script_num-1] # list starts with index 0 = 1 less than counter
-      a = urllib.urlopen(script)
-      if a.getcode() != 200:
-        print "The requested script did not give a 200 return code"
-        return False
-      lines = a.readlines() 
-      if len(lines) == 0:
-        print "Did not get content back from script, maybe it is gone?"
-        return False
-      num_context_lines = 7
-      print "\nExtracting more context for search term <%s> ..." % self.searchTerm
-      print "Showing %i lines before and after the match in the original script hosted here:\n%s\n" % \
-        (num_context_lines, script)
-      for i, line in enumerate(lines):
-        if self.searchTerm in line:
-          print "\n... %s found at line %i ..." % (self.searchTerm, i)
-          j = i - num_context_lines
-          for x in lines[i-num_context_lines : i+num_context_lines]:
-            if self.searchTerm in x:
-              print "%i ---> %s" % (j, x), # makes the match stand out
-            else:
-              print "%i      %s" % (j, x),        
-            j += 1
-    except:
-      print "Something went wrong, could not get the script"
-    pass
-
+    script = self.scripts[script_num-1] # list starts with index 0 = 1 less than counter
+    a = urllib.urlopen(script)
+    if a.getcode() != 200:
+      print "The requested script did not give a 200 return code"
+      return False
+    lines = a.readlines() 
+    a.close()
+    if len(lines) == 0:
+      print "Did not get content back from script, maybe it is gone?"
+      return False
+    num_context_lines = 8
+    print "\nExtracting more context for search term <%s> ..." % self.searchTerm
+    print "Showing %i lines before and after the match in the original script hosted here:\n%s\n" % \
+      (num_context_lines, script)
+    for i, line in enumerate(lines):
+      if self.searchTerm.lower() in line.lower():
+        print "\n... %s found at line %i ..." % (self.searchTerm, i)
+        j = i - num_context_lines
+        for x in lines[i-num_context_lines : i+num_context_lines]:
+          if self.searchTerm.lower() in x.lower():
+            print "%i ---> %s" % (j, x), # makes the match stand out
+          else:
+            print "%i      %s" % (j, x),        
+          j += 1
 
 
 ### instant
