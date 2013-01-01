@@ -1,1 +1,6 @@
 apis/twitter/*
+experiment/*
+python/*pyc
+sitemap.xml
+*.swp
+*/*.swp
