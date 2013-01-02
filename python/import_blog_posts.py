@@ -107,6 +107,9 @@ class ImportBlogPosts(object):
 # another single post on my blog:
 # blog.import_post_urls('http://bobbelderbos.com/2012/10/php-mysql-novice-to-ninja/')
 # 
-# other blog:
-blog = ImportBlogPosts("http://zenhabits.net", '<div class="entry">', '<div class="home_bottom">', "zenhabits.xml") 
-blog.import_post_urls()
+# other blogs:
+# blog = ImportBlogPosts("http://zenhabits.net", '<div class="entry">', '<div class="home_bottom">', "zenhabits.xml") 
+# blog = ImportBlogPosts("http://blog.extracheese.org/", '<div class="post content">', '<div class="clearfix"></div>', "/Users/bbelderbos/Downloads/gary.xml") 
+# blog.import_post_urls()
+blog = ImportBlogPosts("http://programmingzen.com", '<div class="post-wrapper">', 'related posts', "/Users/bbelderbos/Downloads/programmingzen.xml") 
+blog.import_post_urls("/20")
