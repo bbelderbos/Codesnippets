@@ -25,16 +25,11 @@ class ImportBlogPosts(object):
       
   def parse_sitemap(self, sitemap):
     """ Parse blog's specified xml sitemap """
-    posts = {}
+    urls = []
     dom = xml.dom.minidom.parse(sitemap)
     for element in dom.getElementsByTagName('url'):
       url = self.getText(element.getElementsByTagName("loc")[0].childNodes)
-      mod = self.getText(element.getElementsByTagName("lastmod")[0].childNodes)
-      posts[url] = mod # there can be identical mods, but urls are unique
-    urls = []
-    # return urls ordered desc on last mod. date
-    for key, value in sorted(posts.iteritems(), reverse=True, key=lambda (k,v): (v,k)):
-      urls.append(key)
+      urls.append(url)
     return urls
 
 
@@ -53,7 +48,7 @@ class ImportBlogPosts(object):
       if urlCriteria in url: 
         html = self.get_url(url)
         if html != None:
-          self.print_banner(i, url)
+          self.print_banner(i+1, url)
           self.print_content(url)
   
 
