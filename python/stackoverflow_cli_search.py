@@ -3,18 +3,15 @@
 import os, sys, urllib, urllib2, pprint
 from bs4 import BeautifulSoup as Soup
 
-class SoCliSearch(object):
-  """ Query stackoverflow from cli - I think this could be handy in Vim's spit view """
+class StackoverflowCliSearch(object):
+  """ Query stackoverflow from cli 
+      I think this could be handy in Vim's spit view (with ConqueTerm) """
 
   def __init__(self):
     """ Definition class variables, initialize menu """
-    self.urls = {
-      "home" : "http://stackoverflow.com", 
-      "search" : "http://stackoverflow.com/search",
-    }
     self.searchTerm = ""
     self.questions = {}
-    self.showNumAnswers = 1
+    self.showNumAnswers = 1 # show 1 answer first, then 1 by 1 pressing N
     self.show_menu() # start user interaction
 
 
@@ -55,11 +52,11 @@ class SoCliSearch(object):
     self.searchTerm = raw_input("Enter search: ").strip().lower()
     data = {'q': self.searchTerm }
     data = urllib.urlencode(data)
-    soup = self.get_url(self.urls["search"], data)
+    soup = self.get_url("http://stackoverflow.com/search", data)
     for i,res in enumerate(soup.find_all(attrs={'class': 'result-link'})):
       q = res.find('a')
       self.questions[i+1] = {}
-      self.questions[i+1]['url'] = self.urls["home"] + q.get('href')
+      self.questions[i+1]['url'] = "http://stackoverflow.com" + q.get('href')
       self.questions[i+1]['title'] = q.get('title')
     self.list_questions()
 
@@ -96,7 +93,7 @@ class SoCliSearch(object):
       qa = "Question" if i == 0 else "Answer #%d" % i
       out = "%s\n[ %s ]\n%s\n" % ("-"*40, qa, "-"*40)
       out += ''.join(answer.findAll(text=True))
-      # print the Q and first Answer, save subsequent answers for iteration with option S
+      # print the Q and first Answer, save subsequent answers for iteration with option (N)ext answer
       if i <= self.showNumAnswers:
         print out
       else:
@@ -116,4 +113,4 @@ class SoCliSearch(object):
 
    
 # instant
-so = SoCliSearch()
+so = StackoverflowCliSearch()
