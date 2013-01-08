@@ -1,6 +1,6 @@
 <?php
 $baseurl = "http://".$_SERVER["HTTP_HOST"];
-$logfile = "urls.txt";
+$logfile = "images.txt";
 $bgcolor = "#eff1e1";
 $dimensions = array(
   "width" => "200px",
@@ -28,6 +28,18 @@ $sizes = array(
   8 => "500%",
   9 => "1000%",
 );
+$opacities = array(
+  1 => "0.1",
+  2 => "0.2",
+  3 => "0.3",
+  4 => "0.4",
+  5 => "0.5",
+  6 => "0.6",
+  7 => "0.7",
+  8 => "0.8",
+  9 => "0.9",
+  10 => "1",
+);
 $border = "#ccc";
 $radius = "8px";
 $title = array( 
@@ -52,6 +64,7 @@ $images = array(
     "url" => "http://peppoj.net/wp-content/uploads/2010/07/512-Terminal.png",
     "position" => 1,
     "size" => 6,
+    "opacity" => 3,
   ),
 );
 
@@ -69,6 +82,7 @@ if(isset($_GET['bgcolor'])){
   $images["overlay"]["url"] = $_GET["overlay_url"];
   $images["overlay"]["position"] = $_GET["overlay_pos"];
   $images["overlay"]["size"] = $_GET["overlay_size"];
+  $images["overlay"]["opacity"] = $_GET["overlay_opacity"];
 
   # get stored urls
   $file = fopen($logfile, "r") or exit("Unable to open file!");
@@ -126,7 +140,7 @@ li {
   background-color: $bgcolor;
 }
 ul#prevImg {
-  margin-top: -10px;
+  margin-top: 20px;
   width: 250px;
   float: right; 
 }
@@ -151,11 +165,11 @@ ul#prevImg li {
 }
 #overlay {
   width: {$dimensions["width"]}; height: {$dimensions["height"]};
-  opacity: 0.2;
+  opacity: {$opacities[$images["overlay"]["opacity"]]};
   background: url({$images["overlay"]["url"]}) {$positions[$images["overlay"]["position"]]} no-repeat;  
   background-size: {$sizes[$images["overlay"]["size"]]};
 }
-h1 {
+h1,h2,h3 {
   color: {$title["color"]};
   font-family: {$title["font"]};
   padding: 2px 5px;
@@ -291,7 +305,17 @@ print $css;
       }
       ?>
       </select>
-      <label style="color: green; font-weight: bold;">Store URL for this image</label>
+      <label>Opacity of overlay</label>
+      <select name="overlay_opacity">
+      <?php
+      foreach($opacities as $k=>$v){
+        echo "<option value='$k' ";
+        if($k == $images["overlay"]["opacity"]) echo " selected='selected'";
+        echo ">$v</option>";
+      }
+      ?>
+      </select>
+      <label style="color: green; font-weight: bold;">Save this Image<br><small>(see right side)</small></label>
       <input type="checkbox" name="storeLink" id="storeLink" value="1" >
       <input id="submit" value='Create image' type='submit'>
     </form>
@@ -307,7 +331,7 @@ print $css;
     </div>
 
     <ul id="prevImg">
-      <h3>Previously generated</h3>
+      <h3>Saved Images</h3>
       <?php
       $file = fopen($logfile, "r") or exit("Unable to open file!");
       $seen = array();
