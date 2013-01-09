@@ -1,33 +1,29 @@
 set nocompatible
-filetype plugin on 
-set hidden
-
-syntax on
-
-" for command-t
-let mapleader = ","
-
-noremap \ ,
+set history=10000
 set cursorline
-
+set autoindent
+" make searches case-sensitive only if they contain upper-case characters
+set ignorecase smartcase
 " search highlighting
 set hls is
 set incsearch
-nnoremap <silent> <C-l> :nohl<CR><C-l>
-nmap ,c :%s///gn<CR>
-
 " no tabs, but 2 spaces as indenting
 set tabstop=2
 set expandtab
 set shiftwidth=2
 set shiftround
-
+" Tell vim to remember certain things when we exit
+set viminfo='10,\"100,:20,%,n~/.viminfo
+filetype plugin on 
+syntax on
+let mapleader = ","
 " no arrow keys allowed
 noremap <Up> <Nop> 
 noremap <Down> <Nop> 
 noremap <Left> <Nop> 
 noremap <Right> <Nop>
-
+noremap \ ,
+nnoremap <silent> <C-l> :nohl<CR><C-l>
 " extend * search on visual selection
 " from practical vim ch13 (last tip)
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR> 
@@ -40,14 +36,6 @@ function! s:VSetSearch()
   let @s = temp
 endfunction
 
-" Tell vim to remember certain things when we exit
-"  '10  :  marks will be remembered for up to 10 previously edited files
-"  "100 :  will save up to 100 lines for each register
-"  :20  :  up to 20 lines of command-line history will be remembered
-"  %    :  saves and restores the buffer list
-"  n... :  where to save the viminfo files
-set viminfo='10,\"100,:20,%,n~/.viminfo
-
 function! ResCur()
   if line("'\"") <= line("$")
     normal! g`"
@@ -59,3 +47,16 @@ augroup resCur
   autocmd!
   autocmd BufWinEnter * call ResCur()
 augroup END
+
+" handy shortcuts
+nmap ,c :%s///gn<CR>
+nmap ,p :w<CR>:!python %<CR>
+nmap ,h :w<CR>:!php %<CR>
+nmap ,r :w<CR>:!ruby %<CR>
+nmap gf :vertical wincmd f<CR>
+nmap ,v :vsp ~/.vimrc<CR>
+
+" requires conque plugin
+nmap cp :ConqueTermVSplit python<CR>
+nmap ,g :ConqueTermVSplit python /Users/bbelderbos/CODE/codesnippets/python/github_search.py<CR>
+nmap ,s :ConqueTermVSplit python /Users/bbelderbos/CODE/codesnippets/python/stackoverflow_cli_search.py<CR>
