@@ -7,25 +7,25 @@ set ignorecase smartcase
 " search highlighting
 set hls is
 set incsearch
-" no tabs, but 2 spaces as indenting
+" no tabs, I like 2 spaces for indenting
 set tabstop=2
 set expandtab
 set shiftwidth=2
 set shiftround
-" Tell vim to remember certain things when we exit
+" tell vim to remember certain things when we exit
 set viminfo='10,\"100,:20,%,n~/.viminfo
 filetype plugin on 
 syntax on
 let mapleader = ","
-" no arrow keys allowed
+" no arrow keys allowed, I have to use hjkl keys !!
 noremap <Up> <Nop> 
 noremap <Down> <Nop> 
 noremap <Left> <Nop> 
 noremap <Right> <Nop>
 noremap \ ,
+" clears the search buffer
 nnoremap <silent> <C-l> :nohl<CR><C-l>
-" extend * search on visual selection
-" from practical vim ch13 (last tip)
+" extend * search on visual selection - see practical vim ch13 (last tip)
 xnoremap * :<C-u>call <SID>VSetSearch()<CR>/<C-R>=@/<CR><CR> 
 xnoremap # :<C-u>call <SID>VSetSearch()<CR>?<C-R>=@/<CR><CR>
 
@@ -48,15 +48,21 @@ augroup resCur
   autocmd BufWinEnter * call ResCur()
 augroup END
 
-" handy shortcuts
+" shows number of search hits
 nmap ,c :%s///gn<CR>
+" saves + executes scripts
 nmap ,p :w<CR>:!python %<CR>
 nmap ,h :w<CR>:!php %<CR>
 nmap ,r :w<CR>:!ruby %<CR>
+" opens the file under cursor in new vertical split window
 nmap gf :vertical wincmd f<CR>
+" opens vimrc in vert. split window
 nmap ,v :vsp ~/.vimrc<CR>
 
-" requires conque plugin
+" the following shortcuts require the conque plugin
+" open a new vertical split with python
 nmap cp :ConqueTermVSplit python<CR>
-nmap ,g :ConqueTermVSplit python /Users/bbelderbos/CODE/codesnippets/python/github_search.py<CR>
-nmap ,s :ConqueTermVSplit python /Users/bbelderbos/CODE/codesnippets/python/stackoverflow_cli_search.py<CR>
+" search github code in Vim vertical split window
+nmap ,g :ConqueTermVSplit python ~/CODE/codesnippets/python/github_search.py<CR>
+" search stack overflow Q&A in Vim vertical split window
+nmap ,s :ConqueTermVSplit python ~/CODE/codesnippets/python/stackoverflow_cli_search.py<CR>
