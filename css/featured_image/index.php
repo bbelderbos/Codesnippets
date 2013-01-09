@@ -1,4 +1,5 @@
 <?php
+require 'googlefonts.php';
 $baseurl = "http://".$_SERVER["HTTP_HOST"];
 $logfile = "images.txt";
 $bgcolor = "#eff1e1";
@@ -44,11 +45,15 @@ $border = "#ccc";
 $radius = "8px";
 $title = array( 
   "text" => "blog title placeholder",
-  "color" => "#853328", 
-  "size" => "16px", # rfe - in form
-  "font" => "'Limelight', cursive", # rfe - in form
+  "titlecolor" => "000", 
+  "size" => "16px", # rfe - in form?
+  "font" => "Limelight", # default
   "topoffset" => "60px",
 );
+$fonts = array();
+foreach($fontArray as $font){
+  $fonts[$font['css-name']] = str_replace('font-family: ', '', $font['font-family']);
+}
 $images = array(
   "bg1" => array(
     "url" => "https://twimg0-a.akamaihd.net/profile_images/2357974774/vsuua7vxeim2khmxgjrx_bigger.png",
@@ -72,7 +77,9 @@ $images = array(
 if(isset($_GET['bgcolor'])){
   $bgcolor = $_GET['bgcolor'];
   $title["text"] = ucwords($_GET['title']);
+  $title["font"] = $_GET['font'];
   $title["topoffset"] = $_GET['topoffset'];
+  $title["titlecolor"] = $_GET['titlecolor'];
   $images["bg1"]["url"] = $_GET["bg1_url"];
   $images["bg1"]["position"] = $_GET["bg1_pos"];
   $images["bg1"]["size"] = $_GET["bg1_size"];
@@ -109,7 +116,8 @@ if(isset($_GET['bgcolor'])){
 <html>
 <head>
 <title>Featured image creator for blog post</title>
-<link href='http://fonts.googleapis.com/css?family=Limelight' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Montez' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=<?php echo $title["font"]; ?>' rel='stylesheet' type='text/css'>
 <style>
 <?php
 $css = <<<EOD
@@ -170,13 +178,15 @@ ul#prevImg li {
   background-size: {$sizes[$images["overlay"]["size"]]};
 }
 h1,h2,h3 {
-  color: {$title["color"]};
-  font-family: {$title["font"]};
+  color: #000;
+  font-family: 'Montez', cursive;
   padding: 2px 5px;
   background-color: rgba(255, 255, 255, .7); 
   z-index: 990;
 }
 h1#blogtitle {
+  color: {$title["titlecolor"]};
+  font-family: {$fonts[$title["font"]]}
   font-size: {$title["size"]};
   position: absolute;
   top: {$title["topoffset"]}; 
@@ -189,13 +199,13 @@ form {
   overflow: hidden;
   border-right: 1px solid #ddd;
   padding: 10px 20px 10px 0;
-  width: 480px;
+  width: 500px;
 }
 label {
   clear: both;
   float: left;
   margin: 5px;
-  width: 150px;
+  width: 170px;
   padding-top: 5px;
 }
 input, select {
@@ -205,14 +215,14 @@ input, select {
   height: 22px;
   float: right;
 }
-select {
+select, .smallInput {
   width: 146px; 
 }
 input#storeLink {
-  width: 16px; 
-  height: 16px; 
+  width: 20px; 
+  height: 20px; 
   float: left; 
-  margin: 10px 0 0 15px;
+  margin: 10px 0 0 15px;  
 }
 input#submit {
   border-radius: $radius; -webkit-border-radius: $radius; -moz-border-radius: $radius;
@@ -236,13 +246,24 @@ print $css;
     <h1>Create Your Image</h1>
     <a style="margin: 5px; color: red;" href='?'>Start over</a>
     <form id="addImage" name="addImage" method="get">
-      <label>Blog Bg Color</label>
-      <input name="bgcolor" value="<?php echo $bgcolor; ?>">
-      <label>Blog Title</label>
+      <label>1. <a href="http://www.google.com/webfonts">Google Font</a> / Bg color hex</label>
+      <input class="smallInput" name="bgcolor" value="<?php echo $bgcolor; ?>">
+      <select name="font">
+      <?php
+      foreach($fonts as $k=>$v){
+        echo "<option value='$k' ";
+        if($k == $title["font"]) echo " selected='selected'"; 
+        $displayTitle = str_replace(array("'", ";"), "", $v);
+        echo ">$displayTitle</option>";
+      }
+      ?>
+      </select>
+      <label>2. Blog Title</label>
       <input name="title" value="<?php echo $title["text"]; ?>">
-      <label>Blog Title px from top</label>
-      <input name="topoffset" value="<?php echo $title["topoffset"]; ?>">
-      <label>Background image #1 url</label>
+      <label>Px margin-top / Color hex</label>
+      <input class="smallInput" name="topoffset" value="<?php echo $title["topoffset"]; ?>">
+      <input class="smallInput" name="titlecolor" value="<?php echo $title["titlecolor"]; ?>">
+      <label>3. Bg image #1 url</label>
       <input name="bg1_url" value="<?php echo $images["bg1"]["url"]; ?>">
       <label>Scale / Position</label>
       <select name="bg1_pos">
@@ -263,7 +284,7 @@ print $css;
       }
       ?>
       </select>
-      <label>Background image #2 url</label>
+      <label>4. Bg image #2 url (optional)</label>
       <input name="bg2_url" value="<?php echo $images["bg2"]["url"]; ?>">
       <label>Scale / Position</label>
       <select name="bg2_pos">
@@ -284,7 +305,7 @@ print $css;
       }
       ?>
       </select>
-      <label>Overlay image url</label>
+      <label>5. Overlay image url</label>
       <input name="overlay_url" value="<?php echo $images["overlay"]["url"]; ?>">
       <label>Scale / Position</label>
       <select name="overlay_pos">
@@ -315,7 +336,7 @@ print $css;
       }
       ?>
       </select>
-      <label style="color: green; font-weight: bold;">Save this Image<br><small>(see right side)</small></label>
+      <label style="color: green; font-weight: bold;">6. Happy with the result? Mark this box and click "Create image"<br><small>(this saves the image by creating a link at the right)</small></label>
       <input type="checkbox" name="storeLink" id="storeLink" value="1" >
       <input id="submit" value='Create image' type='submit'>
     </form>
