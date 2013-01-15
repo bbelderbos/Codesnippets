@@ -60,9 +60,27 @@ nmap gf :vertical wincmd f<CR>
 nmap ,v :vsp ~/.vimrc<CR>
 
 " the following shortcuts require the conque plugin
-" open a new vertical split with python
+" open programs in new vertical split window:
 nmap cp :ConqueTermVSplit python<CR>
+" open phpsh (fb devs) in split terminal
+nmap ch :ConqueTermVSplit phpsh<CR>
 " search github code in Vim vertical split window
-nmap ,g :ConqueTermVSplit python ~/CODE/codesnippets/python/github_search.py<CR>
+nmap ,g :ConqueTermVSplit python /Users/bbelderbos/CODE/codesnippets/python/github_search.py<CR>
 " search stack overflow Q&A in Vim vertical split window
-nmap ,s :ConqueTermVSplit python ~/CODE/codesnippets/python/stackoverflow_cli_search.py<CR>
+nmap ,s :ConqueTermVSplit python /Users/bbelderbos/CODE/codesnippets/python/stackoverflow_cli_search.py<CR>
+
+" ignore spam
+set wildignore=*.swp,*.bak,*.pyc,*.class,*.jar,*.gif,*.png,*.jpg
+" open all folds
+set foldlevel=99
+
+" install plugins and runtime files in their own private directories.
+call pathogen#infect()
+
+" save with ctrl+s
+:nmap <c-s> :w<CR>
+:imap <c-s> <Esc>:w<CR>a
+:imap <c-s> <Esc><c-s>
+
+" reload .vimrc in current session
+:nmap vc :so $MYVIMRC<CR>
