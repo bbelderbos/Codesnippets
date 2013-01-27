@@ -38,8 +38,8 @@ class MusicAutofill(object):
     parser.add_option('-u', '--usb', help='path to usb stick', dest='usb')
     parser.add_option('-s', '--size', help='max size autofill in MB', dest='size')
     # optional, recommended is -c if you have a big music library
-    parser.add_option("-g", "--genres", help='filter on genres', dest='genres', default=False)
-    parser.add_option("-l", "--length", help='max length of song in minutes', dest='length', default=False)
+    parser.add_option("-g", "--genres", help='filter on genres', dest='genres', action='store_true', default=False)
+    parser.add_option("-l", "--length", help='max length of song in minutes', dest='length', default=False) # rfe: support also > duration
     parser.add_option("-v", "--verbose", help='verbose switch', dest='verbose', action='store_true', default=False)
     parser.add_option("-c", "--caching", help='dump music lib to json for fast retrieval', dest='cache', action='store_true', default=False)
     (opts, args) = parser.parse_args()
@@ -99,19 +99,17 @@ class MusicAutofill(object):
           #mp3FileDetails[mp3]['album'] = a.tag.album 
           #mp3FileDetails[mp3]['artist'] = a.tag.artist 
           mp3FileDetails[mp3]['bytes'] = a.info.size_bytes 
-          if self.maxSongLengthSeconds:
-            mp3FileDetails[mp3]['seconds'] = a.info.time_secs
+          mp3FileDetails[mp3]['seconds'] = a.info.time_secs
+          mp3FileDetails[mp3]['genre'] = a.tag.genre.name 
         except AttributeError as e:
-          # cannot continue without bytes or seconds
+          # cannot continue without details
           # - bytes is necessary to calculate maxAutofillSizeBytes
-          # - seconds if user choose max length of song
-          if self.verbose: self.debug_info("bytes or seconds", mp3, e)
+          # - seconds is needed if user chooses max length of song
+          # - genre is needed if user chooses genre to filter on
+          if self.verbose: 
+            print "cannot get details for %s (%s)" % (mp3, e)
+            print "to debug, run $ eyeD3 '%s'" % mp3
           continue
-        if self.filterOnGenres:
-          try:
-            mp3FileDetails[mp3]['genre'] = a.tag.genre.name 
-          except AttributeError as e:
-            if self.verbose: self.debug_info("genre", mp3, e)
       if self.verbose: print "mp3 data found for %s files" % len(mp3FileDetails)
     return mp3FileDetails
 
@@ -136,36 +134,38 @@ class MusicAutofill(object):
       print "Unable to retrieve music library (%s)" % e
 
 
-  def debug_info(self, failedAttr, mp3, e):
-    """ Print extra info if something goes wrong, and verbose mode is on """
-    print "cannot get %s for %s (%s)" % (failedAttr, mp3, e)
-    print "to debug, run $ eyeD3 '%s'" % mp3
-
-
   def auto_fill(self):
     """ The workhorse that fills the destination path (usb) with music based on provided criteria """
     sizeFilled = 0
     successCounter = failureCounter = 0
-    for mp3, mp3Details in self.mp3FileDetails.iteritems():
-      # if genres have been given in args, filter
-      if self.filterOnGenres and self.mp3FileDetails[randomSong]['genre'].lower() not in self.filterOnGenres:
-        continue
-      # if user specified max size of songs:
-      if self.maxSongLengthSeconds and self.mp3FileDetails[randomSong]['seconds'] < self.maxSongLengthSeconds:
-        continue
+    songsTaken = []
+    while sizeFilled < self.maxAutofillSizeBytes: 
       # take a random song from collection
       randomSong = random.choice(self.mp3FileDetails.keys())
-      # keep track of totl size and if maxAutofill is reached break
-      sizeFilled += self.mp3FileDetails[randomSong]['bytes']
-      if sizeFilled >= self.maxAutofillSizeBytes: 
-        print "%s bytes reached, we're done!" % self.maxAutofillSizeBytes
-        print "Successfully copied: %s / failures upon copying: %s" % (successCounter, failureCounter)
-        break 
+      # don't take a song twice
+      if randomSong in songsTaken:
+        continue
+      songsTaken.append(randomSong)
+      # if genres have been given in args, filter
+      if self.filterOnGenres:
+        if not "genre" in self.mp3FileDetails[randomSong] or self.mp3FileDetails[randomSong]['genre'].lower() not in self.filterOnGenres:
+          continue
+      # if user specified max size of songs:
+      if self.maxSongLengthSeconds:
+        if not "seconds" in self.mp3FileDetails[randomSong] or self.mp3FileDetails[randomSong]['seconds'] > self.maxSongLengthSeconds:
+          continue
       copySuccess = self.copy_mp3_to_usb(randomSong)
       if copySuccess:
         successCounter += 1
       else: 
         failureCounter += 1
+      sizeFilled += self.mp3FileDetails[randomSong]['bytes']
+    print "%s bytes reached, we're done!" % self.maxAutofillSizeBytes
+    print "Successfully copied: %s / failures upon copying: %s" % (successCounter, failureCounter)
+    if self.cache:  
+      print "Cache file %s was used" % self.cacheFile
+      print "- to run without caching, don't use the -c option"
+      print "- to refresh the cache, delete the mentioned file"
 
 
   def copy_mp3_to_usb(self, mp3ToCopy):
