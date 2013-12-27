@@ -47,7 +47,9 @@ while(<POST>){
 	# when in code blog, encode all to not conflict with html page and/or
 	# php of WP
 	if($parse == 0){
-	  print OUT encode_entities($_);
+    my $line = encode_entities($_);
+    $line =~ s/&Acirc;//g;
+	  print OUT $line;
 	  next;
 	}
 
