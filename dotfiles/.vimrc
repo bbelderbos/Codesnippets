@@ -52,6 +52,7 @@ augroup END
 nmap ,c :%s///gn<CR>
 " saves + executes scripts
 nmap ,p :w<CR>:!python %<CR>
+nmap ,b :w<CR>:!bash %<CR>
 nmap ,h :w<CR>:!php %<CR>
 nmap ,r :w<CR>:!ruby %<CR>
 " opens the file under cursor in new vertical split window
