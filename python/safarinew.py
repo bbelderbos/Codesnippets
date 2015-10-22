@@ -58,6 +58,7 @@ class SafariNew:
         out.append("<li><a href='%s'>%s</a>&nbsp;&nbsp;[<a href='%s'>%s</a>]</li>\n" % \
           (i["link"], i["title"], self.publisherQuery.replace("SEARCH", urllib.quote(i["publisher"])), i["publisher"]))
     out.append("</ul>")
+    out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a></p>")
     return "\n".join(out).encode('ascii', 'ignore')
 
   def mail_html(self, recipients, content):
