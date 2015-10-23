@@ -128,24 +128,23 @@ if __name__ == "__main__":
 
   if not daily and not weekly:
     usage()
+  elif daily: 
+    titles = [] # only filtering on the big weekly
 
   sn = SafariNew(cache=cache)
   if daily:
     sn.filters["added"] = 1
     content = sn.generate_html()
-    print content
   elif weekly:
     sn.filters["added"] = 7
     if titles:
-      content = "<h2>Filtering on title strings: %s</h2>\n" % " | ".join(titles)
-      content += sn.generate_html(filters={"title": titles}, printSource=False) 
+      content = sn.generate_html(filters={"title": titles}, printSource=False) 
     else:
       content = sn.generate_html()
-    print content
         
   if emails:
     dayStr = "day" if sn.filters["added"] == 1 else "%i days" % sn.filters["added"]
     subject = "New books added to Safari in the last %s" % dayStr 
     if titles:
-      subject += " (filtered on %s)" % " | ".join(titles)
+      subject += " (filtering titles on %s)" % " | ".join(titles)
     sn.mail_html(emails, subject, content)
