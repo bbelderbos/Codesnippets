@@ -51,14 +51,23 @@ class SafariNew:
       return True 
     return False
 
-  def show_items(self, filters=None):
+  def _pass_filters(self, item, filters):
+    if not filters:
+      return True
+    for lookIn,lookFor in filters.items():
+      if lookIn in item and re.search(r'\b%s\b' % lookFor.lower(), item[lookIn].lower()):
+        return True
+    return False
+
+  def generate_html(self, filters=None, printSource=True):
     out = ["<ul>"]
     for i in self.items:
-      if self._title_new_enough(i["added"]):
+      if self._title_new_enough(i["added"]) and self._pass_filters(i, filters):
         out.append("<li><a href='%s'>%s</a>&nbsp;&nbsp;[<a href='%s'>%s</a>]</li>\n" % \
           (i["link"], i["title"], self.publisherQuery.replace("SEARCH", urllib.quote(i["publisher"])), i["publisher"]))
     out.append("</ul>")
-    out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a></p>")
+    if printSource:
+      out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a></p>")
     return "\n".join(out).encode('ascii', 'ignore')
 
   def mail_html(self, recipients, content):
@@ -77,6 +86,12 @@ class SafariNew:
 
 if __name__ == "__main__":
   sn = SafariNew()
-  content = sn.show_items()
-  recipients = ["some@gmail.com", "one@gmail.com", ]
-  sn.mail_html(recipients, content)
+  sn.filters["added"] = 7
+  for s in ("Java", "Python", "Android", "Big Data", "Javascript", "Unix"):
+    print s
+    print sn.generate_html(filters={"title": s}, printSource=False)
+  for p in ("Reilly", "Packt"):
+    print p
+    print sn.generate_html(filters={"publisher": p}, printSource=False)
+  #recipients = ["some@gmail.com", "one@gmail.com", ]
+  #sn.mail_html(recipients, content)
