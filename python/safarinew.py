@@ -78,5 +78,5 @@ class SafariNew:
 if __name__ == "__main__":
   sn = SafariNew()
   content = sn.show_items()
-  recipients = ["bobbelderbos@gmail.com", "sequeira.julian@gmail.com", ]
+  recipients = ["some@gmail.com", "one@gmail.com", ]
   sn.mail_html(recipients, content)
