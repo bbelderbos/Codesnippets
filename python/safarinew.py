@@ -4,6 +4,7 @@ import os
 import re
 import sys
 import smtplib
+import time
 import urllib
 from bs4 import BeautifulSoup as Soup
 from email.mime.multipart import MIMEMultipart
@@ -14,15 +15,24 @@ class SafariNew:
   def __init__(self, cache=False):
     self.cache = cache
     self.cacheFile = "safari_new.html"
+    self.secInDay = 24*60*60
+    self.now = int(time.time())
     self.url = "https://www.safaribooksonline.com/explore/new/by-day/"
     self.soup = self._get_soup()
     self.items = self._parse_items()
     self.publisherQuery = "https://www.safaribooksonline.com/search/?query=SEARCH&field=publishers&sort=date_added&highlight=true"
     self.filters = { "title": None, "link": None, "author": None, "publisher": None, "added": 1, }
 
+  def _refresh_cache(self):
+    st=os.stat(self.cacheFile)
+    cacheCreated = int(st.st_mtime)
+    renew = (self.now - cacheCreated) > self.secInDay
+    if renew: print "Cache file expired, downloading a new copy ..."
+    return renew
+
   def _get_soup(self):
     if self.cache: 
-      if not os.path.isfile(self.cacheFile):
+      if not os.path.isfile(self.cacheFile) or self._refresh_cache():
         try:
           urllib.urlretrieve(self.url, self.cacheFile) 
         except:
