@@ -10,15 +10,27 @@ from email.mime.text import MIMEText
 
 class SafariNew:
 
-  def __init__(self):
-    self.page = "https://www.safaribooksonline.com/explore/new/by-day/"
-    try:
-      self.soup = Soup(urllib.urlopen(self.page), 'html5lib') # needed otherwise incomplete html parsing (div class 'list-item')
-    except IOError:
-      sys.exit("Cannot retrieve %s" % self.page) 
+  def __init__(self, cache=False):
+    self.cache = cache
+    self.url = "https://www.safaribooksonline.com/explore/new/by-day/"
+    self.page = "index.html"
+    self.fullUrl = os.path.join(self.url, self.page)  
+    self.soup = self._get_soup()
     self.items = self._parse_items()
     self.publisherQuery = "https://www.safaribooksonline.com/search/?query=SEARCH&field=publishers&sort=date_added&highlight=true"
     self.filters = { "title": None, "link": None, "author": None, "publisher": None, "added": 1, }
+
+  def _get_soup(self):
+    if self.cache and os.path.isfile(self.page):
+      f = open(self.page)
+    else:
+      f = urllib.urlopen(self.fullUrl)
+    try:
+      soup = Soup(f, 'html5lib') # needed otherwise incomplete html parsing (div class 'list-item')
+    except IOError:
+      sys.exit("Cannot retrieve %s" % self.fullUrl) 
+    f.close()
+    return soup
 
   def _parse_items(self):
     items = []
@@ -85,7 +97,8 @@ class SafariNew:
 
 
 if __name__ == "__main__":
-  sn = SafariNew()
+  sn = SafariNew(cache=True)
+  sys.exit()
   sn.filters["added"] = 7
   for s in ("Java", "Python", "Android", "Big Data", "Javascript", "Unix"):
     print s
