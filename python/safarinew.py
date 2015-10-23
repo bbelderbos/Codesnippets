@@ -101,12 +101,8 @@ class SafariNew:
     for lookIn,lookFor in filters.items():
       if lookIn in item: 
         for lf in lookFor: 
-          if " " in lf: # e.g. "big data"
-            if re.search(r'%s' % lf.lower(), item[lookIn].lower()): 
-              return True
-          else:
-            if re.search(r'\b%s\b' % lf.lower(), item[lookIn].lower()): # java (need word boundary to not hit javascipt)
-              return True
+          if re.search(r'\b%s\b' % lf.lower(), item[lookIn].lower()): # java (need word boundary to not hit javascipt)
+            return True
     return False
 
   def generate_html(self, filters=None):
