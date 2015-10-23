@@ -17,7 +17,7 @@ class SafariNew:
     except IOError:
       sys.exit("Cannot retrieve %s" % self.page) 
     self.items = self._parse_items()
-    self.publisherQuery = "https://www.safaribooksonline.com/search/?query=SEARCH&field=publishers&highlight=true"
+    self.publisherQuery = "https://www.safaribooksonline.com/search/?query=SEARCH&field=publishers&sort=date_added&highlight=true"
     self.filters = { "title": None, "link": None, "author": None, "publisher": None, "added": 1, }
 
   def _parse_items(self):
