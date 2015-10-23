@@ -1,4 +1,5 @@
 #!/usr/bin/python
+import getopt
 import os
 import re
 import sys
@@ -67,8 +68,10 @@ class SafariNew:
     if not filters:
       return True
     for lookIn,lookFor in filters.items():
-      if lookIn in item and re.search(r'\b%s\b' % lookFor.lower(), item[lookIn].lower()):
-        return True
+      if lookIn in item: 
+        for lf in lookFor: 
+          if re.search(r'\b%s\b' % lf.lower(), item[lookIn].lower()):
+            return True
     return False
 
   def generate_html(self, filters=None, printSource=True):
@@ -82,11 +85,10 @@ class SafariNew:
       out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a></p>")
     return "\n".join(out).encode('ascii', 'ignore')
 
-  def mail_html(self, recipients, content):
+  def mail_html(self, recipients, subject, content):
     sender = "info@bobbelderbos.com"
     msg = MIMEMultipart('alternative')
-    dayStr = "day" if self.filters["added"] == 1 else "%i days" % self.filters["added"]
-    msg['Subject'] = "New books added to Safari in the last %s" % dayStr 
+    msg['Subject'] = subject
     msg['From'] = sender
     msg['To'] = ", ".join(recipients)
     part = MIMEText(content, 'html')
@@ -97,14 +99,49 @@ class SafariNew:
 
 
 if __name__ == "__main__":
-  sn = SafariNew(cache=True)
-  sys.exit()
-  sn.filters["added"] = 7
-  for s in ("Java", "Python", "Android", "Big Data", "Javascript", "Unix"):
-    print s
-    print sn.generate_html(filters={"title": s}, printSource=False)
-  for p in ("Reilly", "Packt"):
-    print p
-    print sn.generate_html(filters={"publisher": p}, printSource=False)
-  #recipients = ["some@gmail.com", "one@gmail.com", ]
-  #sn.mail_html(recipients, content)
+  def usage():
+    print "%s -c <cache file> -d <daily> -e <emails (comma separated)> -t <titles (comma separated)> -w <weekly>" % sys.argv[0]
+    sys.exit()
+  try:
+    opts, args = getopt.getopt(sys.argv[1:],"hcdwe:t:")
+  except getopt.GetoptError:
+    usage()
+  cache = daily = weekly = False
+  emails = titles = []
+  for opt, arg in opts:
+    if opt == '-h':
+      usage()
+    elif opt == "-c":
+      cache = True
+    elif opt == "-d":
+      daily = True
+    elif opt == "-e":
+      emails = arg.split(",") if "," in arg else [arg]
+    elif opt == "-t":
+      titles = arg.split(",") if "," in arg else [arg]
+    elif opt == "-w":
+      weekly = True
+
+  if not daily and not weekly:
+    usage()
+
+  sn = SafariNew(cache=cache)
+  if daily:
+    sn.filters["added"] = 1
+    content = sn.generate_html()
+    print content
+  elif weekly:
+    sn.filters["added"] = 7
+    if titles:
+      content = "<h2>Filtering on title strings: %s</h2>\n" % " | ".join(titles)
+      content += sn.generate_html(filters={"title": titles}, printSource=False) 
+    else:
+      content = sn.generate_html()
+    print content
+        
+  if emails:
+    dayStr = "day" if sn.filters["added"] == 1 else "%i days" % sn.filters["added"]
+    subject = "New books added to Safari in the last %s" % dayStr 
+    if titles:
+      subject += " (filtered on %s)" % " | ".join(titles)
+    sn.mail_html(emails, subject, content)
