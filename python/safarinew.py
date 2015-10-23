@@ -13,23 +13,27 @@ class SafariNew:
 
   def __init__(self, cache=False):
     self.cache = cache
+    self.cacheFile = "safari_new.html"
     self.url = "https://www.safaribooksonline.com/explore/new/by-day/"
-    self.page = "index.html"
-    self.fullUrl = os.path.join(self.url, self.page)  
     self.soup = self._get_soup()
     self.items = self._parse_items()
     self.publisherQuery = "https://www.safaribooksonline.com/search/?query=SEARCH&field=publishers&sort=date_added&highlight=true"
     self.filters = { "title": None, "link": None, "author": None, "publisher": None, "added": 1, }
 
   def _get_soup(self):
-    if self.cache and os.path.isfile(self.page):
-      f = open(self.page)
+    if self.cache: 
+      if not os.path.isfile(self.cacheFile):
+        try:
+          urllib.urlretrieve(self.url, self.cacheFile) 
+        except:
+          sys.exit("cannot download html from %s" % self.url)
+      f = open(self.cacheFile)
     else:
-      f = urllib.urlopen(self.fullUrl)
+      f = urllib.urlopen(self.url)
     try:
       soup = Soup(f, 'html5lib') # needed otherwise incomplete html parsing (div class 'list-item')
     except IOError:
-      sys.exit("Cannot retrieve %s" % self.fullUrl) 
+      sys.exit("Cannot retrieve %s" % self.url) 
     f.close()
     return soup
 
