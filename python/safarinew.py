@@ -1,4 +1,12 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*- 
+#
+# Author: @bbelderbos
+# Date: 23/10/2015
+# Purpose: generate email notifications from newly added books on Safari books online
+#  @ https://www.safaribooksonline.com/explore/new/by-day/
+# Script requirements: BeautifulSoup and html5lib
+#
 import getopt
 import os
 import re
@@ -112,7 +120,8 @@ class SafariNew:
         out.append("<li><a href='%s'>%s</a>&nbsp;&nbsp;[<a href='%s'>%s</a>]</li>\n" % \
           (i["link"], i["title"], self.publisherQuery.replace("SEARCH", urllib.quote(i["publisher"])), i["publisher"]))
     out.append("</ul>")
-    out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a></p>")
+    out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a>")
+    out.append(" | output generated and mailed via <a href='http://bobbelderbos.com/codesnippets/python/safarinew.py'>%s</a></p>" % sys.argv[0])
     return "\n".join(out).encode('ascii', 'ignore')
 
   def mail_html(self, recipients, subject, content):
