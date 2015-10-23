@@ -3,7 +3,7 @@
 #
 # Author: @bbelderbos
 # Date: 23/10/2015
-# Purpose: generate email notifications from newly added books on Safari books online
+# Purpose: generate email notifications from newly added books on Safari books online
 #  @ https://www.safaribooksonline.com/explore/new/by-day/
 # Script requirements: BeautifulSoup and html5lib
 #
