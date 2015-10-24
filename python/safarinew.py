@@ -121,7 +121,7 @@ class SafariNew:
           (i["link"], i["title"], self.publisherQuery.replace("SEARCH", urllib.quote(i["publisher"])), i["publisher"]))
     out.append("</ul>")
     out.append("<p>Source: <a href='https://www.safaribooksonline.com/explore/new/by-day/'>Safari new by day</a>")
-    out.append(" | output generated and mailed via <a href='http://bobbelderbos.com/codesnippets/python/safarinew.py'>%s</a></p>" % sys.argv[0])
+    out.append(" | output generated and mailed via <a href='http://bobbelderbos.com/codesnippets/python/safarinew.py'>%s</a></p>" % os.path.basename(sys.argv[0]))
     return "\n".join(out).encode('ascii', 'ignore')
 
   def mail_html(self, recipients, subject, content):
