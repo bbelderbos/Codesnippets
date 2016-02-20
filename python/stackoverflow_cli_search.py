@@ -64,7 +64,7 @@ class StackoverflowCliSearch(object):
   def get_url(self, url, data=False):
     """ Imports url data into Soup for easy html parsing """
     u = urllib2.urlopen(url, data) if data else urllib2.urlopen(url)
-    return Soup(u)
+    return Soup(u, "html5lib")
 
 
   def list_questions(self, repeat=False):
