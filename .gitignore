@@ -1,7 +1,0 @@
-apis/twitter/*
-experiment/*
-python/*pyc
-python/safari_new.html
-sitemap.xml
-*.swp
-*/*.swp
